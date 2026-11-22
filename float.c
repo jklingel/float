@@ -135,9 +135,6 @@ int32_t fixed_mul(int32_t a, int32_t b) {
     else
       ub = (uint32_t)b;
 
-    // x >> 1 = int / 2; x << 1 = int * 2
-    // unsigned 1 << 16 = 65536
-    // unsigned 1 >> 16 = 0
     a_hi = ua >> 16;
     a_lo = ua & 0xFFFF; // 65535
     b_hi = ub >> 16;
