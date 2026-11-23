@@ -2,9 +2,9 @@
 // not support. The numbers are encoded in fixed Q16.16 format using
 // ARM Q notation..
 // Framework written by Google Gemini
-// Error correction and functions fixed_add, fixed_qadd, and
-// fixed_sub by Jan Klingel, 11/2026
-// Version 0.2
+// Error correction and functions fixed_add, fixed_qadd, fixed_div
+// and fixed_sub by Jan Klingel, 11/2026
+// Version 0.3
 
 // Q16.16 has a maximum range of -32768.0 to +32767.99998
 // (−2^m−1 to +2^m−1 − 2^−n)
@@ -135,6 +135,9 @@ int32_t fixed_mul(int32_t a, int32_t b) {
     else
       ub = (uint32_t)b;
 
+    // x >> 1 = int / 2; x << 1 = int * 2
+    // unsigned 1 << 16 = 65536
+    // unsigned 1 >> 16 = 0
     a_hi = ua >> 16;
     a_lo = ua & 0xFFFF; // 65535
     b_hi = ub >> 16;
@@ -147,4 +150,57 @@ int32_t fixed_mul(int32_t a, int32_t b) {
           ((a_lo * b_lo) >> 16);
 
     return (sign < 0) ? -(int32_t)res : (int32_t)res;
+}
+
+// fixed_div() - Divide a by b using Q16.16 fixed format integers
+int32_t fixed_div(int32_t a, int32_t b) {
+    uint32_t ua; // upper part of a (the integer portion)
+    uint32_t ub; // upper part of b (the integer portion)
+    uint32_t quot;
+    uint32_t rem;
+    unsigned char sign; // the sign of the computation
+    unsigned char i; // counter
+    unsigned char carry; // carry flag
+
+    // Handle division by zero
+    if (b == 0L) {
+        return (a >= 0L) ? 0x7FFFFFFFL : (int32_t)0x80000000UL;
+    }
+
+    // Determine result sign and convert inputs to unsigned magnitudes safely
+    sign = 0;
+    if (a < 0L) {
+        sign = !sign;
+        ua = 0UL - (uint32_t)a;
+    } else {
+        ua = (uint32_t)a;
+    }
+
+    if (b < 0L) {
+        sign = !sign;
+        ub = 0UL - (uint32_t)b;
+    } else {
+        ub = (uint32_t)b;
+    }
+
+    // Step 1: Compute the integer portion (upper 16 bits of result)
+    quot = ua / ub;
+    rem  = ua % ub;
+
+    // Step 2: Shift-and-subtract 16 times for the fractional bits
+    for (i = 0; i < 16; ++i) {
+        carry = (rem & 0x80000000UL) ? 1 : 0;
+        rem <<= 1;
+        quot <<= 1;
+
+        if (carry || rem >= ub) {
+            rem -= ub;
+            quot |= 1UL;
+        }
+    }
+
+    // Reapply sign
+    if (sign)
+      return (int32_t)(0UL - quot);
+    return (int32_t)quot;
 }

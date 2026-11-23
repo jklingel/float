@@ -1,7 +1,7 @@
 // float.h - Header file for the float.o library, which adds
 // some floating-point arithmetic to the cc65 compiler
 
-// Jan Klingel, 11/2026, version 0.2
+// Jan Klingel, 11/2026, version 0.3
 
 // Needed for a safe add function to prevent wrap-around when adding
 // large numbers like 20000.0 + 20000.0
@@ -15,3 +15,4 @@ int32_t fixed_add(int32_t a, int32_t b);
 int32_t fixed_qadd(int32_t a, int32_t b);
 int32_t fixed_sub(int32_t a, int32_t b);
 int32_t fixed_mul(int32_t a, int32_t b);
+int32_t fixed_div(int32_t a, int32_t b);
