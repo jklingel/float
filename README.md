@@ -5,8 +5,10 @@ The cross-compiler cc65 has one big disadvantage: there is no floating point ari
 
 As a result, programs compiled with cc65 can use signed and unsigned integers (like in -2, -1, 0, 1, 2...) up to a width of 32 bits (unsigned 0..65536 times two in decimal). A floating point variable like '3.14' is not supported. This is a major roadblock for even simple programs in which the fractional part of an integer is important, e.g. when calculating with the constant Pi (~3.14159).
 
-I wrote a small library that takes two floating point numbers as strings and converts them to a Q16.16 fixed format in ARM Q notation. Q16.16 means that the floating point variable is represented by 16-1 bit for the integert part and 16 bit for the fractional part. ARM Q notation means that the very first bit is the sign (+/0 or -/1) and part of the notation. The converted, fixed numbers can now be added, subtracted, and multiplied. The result returned by the library is again a fixed Q16.16 integer that can be converted to a string for printing. "Fixed" means that the period '.' separating the integer from the fractional part always stays at the same place.
+I wrote a small library that takes two floating point numbers as strings and converts them to a Q16.16 fixed format in ARM Q notation. Q16.16 means that the floating point variable is represented by 16-1 bit for the integert part and 16 bit for the fractional part. ARM Q notation means that the very first bit is the sign (+/0 or -/1) and part of the notation. The converted, fixed numbers can now be added, subtracted, multiplied, and divided. The result returned by the library is again a fixed Q16.16 integer that can be converted to a string for printing. "Fixed" means that the period '.' separating the integer from the fractional part always stays at the same place.
+
+ftest.c is a simple program demonstrating how the float library works. Note that the output as a 32-bit binary number is currently working only with modern (GCC) compilers, not with cc65. Reason being that I used the "032b%" format specifier, which does not exist in ANSI C.
 
 See https://janklingel.de/2026/11/22/a-simple-c-float-library-for-cc65/ for more details.
 
-Version 0.2 as of 11/22/2026
+Version 0.3 as of 11/23/2026
